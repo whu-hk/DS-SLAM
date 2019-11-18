@@ -34,11 +34,18 @@ We provide one example to process the TUM dataset as RGB-D image. A version Hydr
 
 ### SegNet
 
-We adopt SegNet to provide pixel-wise semantic segmentation based on caffe in real-time. Download and decompress DS_SLAM library (provided at https://github.com/zoeyuchao/DS-SLAM) in catkin_ws/src. Then you can find the Example folder in the folder of DS-SLAM. We suggest the installation path of caffe-segnet to be /Examples/ROS/ORB_SLAM2_PointMap_SegNetM. The root of Download and install instructions can be found at: https://github.com/TimoSaemann/caffe-segnet-cudnn5
+We adopt SegNet to provide pixel-wise semantic segmentation based on caffe in real-time. Download and decompress DS_SLAM library (provided at https://github.com/zoeyuchao/DS-SLAM) in catkin_ws/src. Then you can find the Example folder in the folder of DS-SLAM. We suggest the installation path of caffe-segnet to be /Examples/ROS/ORB_SLAM2_PointMap_SegNetM. 
+
+The root of Download and install instructions can be found at: https://github.com/TimoSaemann/caffe-segnet-cudnn5.
+caffe的安装过程需要OpenCV,与ROS自带OpenCV的兼容编译可以参考博客https://blog.csdn.net/abc039510/article/details/103032120
 
 ### OctoMap and RVIZ
 
-We provide semantic presentation of the octo-tree map by OctoMap. RViz display plugins for visualizing octomap messages. We suggest that the installation path of octomap_mapping and octomap_rviz_plugins to be catkin_ws/src. Add #define COLOR_OCTOMAP_SERVER into the OctomapServer.h at the folder of  octomap_mapping/octomap_server/include/octomap_server Download and install instructions can be found at: https://github.com/OctoMap/octomap_mapping and https://github.com/OctoMap/octomap_rviz_plugins.    
+稠密八叉树地图支持包安装：https://blog.csdn.net/weixin_39123145/article/details/82219968
+额外操作：
+1.打开头文件开关#define COLOR_OCTOMAP_SERVER，文件路径（/home/xxx/catkin_ws/src/octomap_mapping/octomap_server/include/octomap_server/octomapServer.h）
+2.彩色八叉地图参数设置：<param name="colored_map" type="bool" value="True" />，文件路径
+(/home/whu-hk/catkin_ws/src/DS-SLAM/Examples/ROS/ORB_SLAM2_PointMap_SegNetM/launch/Octomap.launch)
 
 # 3. Building DS_SLAM library and the example
 
@@ -49,6 +56,7 @@ cd DS-SLAM
 chmod +x DS_SLAM_BUILD.sh
 ./DS_SLAM_BUILD.sh
 ```
+首先编译第三方库和ORB词典；第二步编译caffe，参考第二节；第三步编译SegNet包，实际为caffe-segnet-cudnn5/Examples中SegNet_with_C++的改写；第四步编译改写的ORB-SLAM2；最后编译出可执行文件TUM
 
 # 4. TUM example
 
@@ -57,14 +65,19 @@ chmod +x DS_SLAM_BUILD.sh
 ```
 export  ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:PATH/DS-SLAM/Examples/ROS/ORB_SLAM2_PointMap_SegNetM
 ```
+或者将/DS_SLAM放置在/catkin_ws/src/下，执行rospack profile命令检查是否ROS能否找到对应包。
 
 2. Download a sequence from http://vision.in.tum.de/data/datasets/rgbd-dataset/download and unzip it. We suggest you download rgbd_dataset_freiburg3_walking_xyz.
+提供百度网盘下载链接: https://pan.baidu.com/s/1W5jwhrdEPmZSaQ2rtm2Ahw 提取码: cdqs 
+原始的TUM RGB-D数据集额外使用tools实现几个功能，比如depth和rgb的时间戳对齐，轨迹精度评估及可视化，在网盘分享中均有。
+
 3. We provide DS_SLAM_TUM.launch script to run TUM example. Change PATH_TO_SEQUENCE and  PATH_TO_SEQUENCE/associate.txt in the DS_SLAM_TUM.launch to the sequence directory that you download before, then  execute the following command in a new terminal. Execute:
 
 ```
 cd DS-SLAM
 roslaunch DS_SLAM_TUM.launch 
 ```
+修改各个参数的实际路径，其包含的octo lanuch文件修改已在前文中提及。
 
 #  5. Something about Folders
 
@@ -74,7 +87,8 @@ The function of folder in the catkin_ws/src/ORB_SLAM2_PointMap_SegNetM/Examples/
 2. launch: used for showing octomap.
 3. prototxts and tools: containing some parameters associated with caffe net relating to the semantic segmentation thread of DS_SLAM. There is the folder of models(provided at https://pan.baidu.com/s/1gkI7nAvijF5Fjj0DTR0rEg extract code: fpa3), please download and place the folder in the same path with the folder of prototxts and tools.
 
-
+# 6. 本fork版本暂时不支持ORB词典的bin格式
+需要在ORB的src/System.cc中删除二进制词典读取函数
 
 
 
